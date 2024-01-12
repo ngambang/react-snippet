@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-const SelectTags = ({ options = [], onSelect = () => {} }) => {
+const SelectSegmentations = ({ options = [], onSelect = () => {} }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredOptions, setFilteredOptions] = useState(options);
   const [selectedOptions, setSelectedOptions] = useState([]);
@@ -10,6 +10,14 @@ const SelectTags = ({ options = [], onSelect = () => {} }) => {
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
+    console.log(e)
+    if (
+      e.key === 'Backspace' &&
+      searchTerm === '' &&
+      selectedOptions.length > 0 
+    ) {
+      handleRemoveOption(selectedOptions[selectedOptions.length - 1].value);
+    }
 
     const notSelectedOptions = options.filter(
       (option) => !selectedOptions.some((selected) => selected.value === option.value)
@@ -17,6 +25,7 @@ const SelectTags = ({ options = [], onSelect = () => {} }) => {
 
     const filtered = notSelectedOptions.filter((option) => option.label.toLowerCase().includes(term));
     setFilteredOptions(filtered);
+   
   };
 
   const handleOpenDropdown = () => {
@@ -42,12 +51,6 @@ const SelectTags = ({ options = [], onSelect = () => {} }) => {
     onSelect(updatedOptions);
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key === 'Backspace' && searchTerm === '' && selectedOptions.length > 0) {
-      handleRemoveOption(selectedOptions[selectedOptions.length - 1].value);
-    }
-  };
-
   const newOptions = () => {
     if (selectedOptions.length > 0) {
       const newOptions = options.filter((option) => !selectedOptions.some((selected) => selected.value === option.value));
@@ -67,13 +70,11 @@ const SelectTags = ({ options = [], onSelect = () => {} }) => {
     };
 
     document.addEventListener('click', handleOutsideClick);
-    document.addEventListener('keydown', handleKeyDown);
 
     return () => {
       document.removeEventListener('click', handleOutsideClick);
-      document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [dropdownRef, searchTerm, selectedOptions]);
+  }, [dropdownRef]);
 
   useEffect(() => {
     newOptions();
@@ -92,6 +93,7 @@ const SelectTags = ({ options = [], onSelect = () => {} }) => {
           placeholder='Search...'
           value={searchTerm}
           onChange={handleSearch}
+          onKeyDown={handleSearch}
           onFocus={handleOpenDropdown}
         />
       </div>
@@ -108,4 +110,4 @@ const SelectTags = ({ options = [], onSelect = () => {} }) => {
   );
 };
 
-export default SelectTags;
+export default SelectSegmentations;
